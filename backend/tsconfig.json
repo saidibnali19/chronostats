@@ -7,7 +7,7 @@
 
         // Environment Settings
         // See also https://aka.ms/tsconfig/module
-        "module": "esnext",
+        "module": "nodenext",
         "target": "es2020",
         "types": ["node"],
         // For nodejs:
@@ -34,8 +34,6 @@
 
         // Recommended Options
         "strict": true,
-        "jsx": "react-jsx",
-        "verbatimModuleSyntax": true,
         "isolatedModules": true,
         "noUncheckedSideEffectImports": true,
         "moduleDetection": "force",
@@ -43,7 +41,8 @@
 
         // Personal additions
         "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "moduleResolution": "NodeNext"
     },
     "include": ["src"]
 }
