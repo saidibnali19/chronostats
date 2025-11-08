@@ -3,3 +3,9 @@ export interface Feature {
     description: string;
     icon: string;
 }
+
+export interface BlogPost {
+    title: string;
+    imageUrl: string;
+    slug: string;
+}

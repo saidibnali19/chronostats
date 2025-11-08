@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
-import * as testRouterModule from "./routes/test.route.js";
 
 dotenv.config();
 const app = express();
@@ -20,13 +19,6 @@ app.use(
     })
 );
 app.use(express.json());
-
-const testRouter =
-    testRouterModule && (testRouterModule as any).default
-        ? (testRouterModule as any).default
-        : (testRouterModule as any);
-
-app.use("/api/test", testRouter);
 
 const PORT = process.env.PORT || 5000;
 

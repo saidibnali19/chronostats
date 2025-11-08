@@ -5,7 +5,7 @@ import Feature from "./Feature";
 export default function Features() {
     return (
         <>
-            <article className="bg-base-500 space-y-4 overflow-x-clip px-4 py-20 md:py-30">
+            <article className="bg-base-500 mx-auto max-w-7xl space-y-4 overflow-x-clip px-4 py-20 md:py-30">
                 <h2 className="text-base-500 text-center text-2xl font-medium">
                     Features
                 </h2>
