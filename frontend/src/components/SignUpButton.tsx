@@ -1,7 +1,9 @@
-export default function SignUpButton() {
+export default function SignUpButton({ setOpen }) {
     return (
         <>
-            <button className="btn btn-primary">Sign Up</button>
+            <button className="btn btn-primary" onClick={() => setOpen(true)}>
+                Sign Up
+            </button>
         </>
     );
 }
