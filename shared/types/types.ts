@@ -7,5 +7,4 @@ export interface Feature {
 export interface BlogPost {
     title: string;
     imageUrl: string;
-    slug: string;
 }

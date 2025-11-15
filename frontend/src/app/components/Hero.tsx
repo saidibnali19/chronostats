@@ -4,8 +4,8 @@ import PrimaryCTA from "./PrimaryCTA";
 export default function Hero() {
     return (
         <>
-            <article className="mx-auto grid min-h-[calc(100svh-8rem)] max-w-7xl items-end px-4 pb-4 md:min-h-[calc(100svh-5rem)]">
-                <div className="space-y-4">
+            <article className="mx-auto grid min-h-[calc(100svh-8rem)] max-w-7xl items-end bg-[url(/images/hero.jpg)] bg-cover px-4 pb-4 md:min-h-[calc(100svh-5rem)]">
+                <div className="bg-base-400 space-y-4 rounded-md p-4 opacity-90">
                     <h1 className="text-base-500 text-3xl font-medium md:text-4xl">
                         Chronostats
                     </h1>
