@@ -20,6 +20,10 @@
     .form-input {
         @apply rounded-sm border border-gray-200 bg-gray-100 p-[.5lh_2ch] text-gray-800 focus-visible:outline-cyan-200;
     }
+
+    .card {
+        @apply overflow-clip rounded-lg p-8;
+    }
 }
 
 @layer utilities {

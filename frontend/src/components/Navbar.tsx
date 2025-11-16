@@ -5,11 +5,12 @@ import SignInButton from "./SignInButton";
 import SignUpButton from "./SignUpButton";
 import { useState } from "react";
 import SignupModal from "./auth/SignupModal";
-import { User as UserType } from "../../../shared/types/types";
-import { User } from "lucide-react";
+// import { User as UserType } from "../../../shared/types/types";
+// import { User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import SignOutButton from "./SignOutButton";
+// import SignOutButton from "./SignOutButton";
 import SignInModal from "./auth/SigninModal";
+import LoggedInUI from "./LoggedInUI";
 
 export default function Navbar() {
     const [openSignUpModal, setOpenSignUpModal] = useState(false);
@@ -83,28 +84,4 @@ export default function Navbar() {
 
 function Skeleton() {
     return <div className="h-9 w-24 animate-pulse rounded bg-gray-200" />;
-}
-
-function LoggedInUI({
-    user,
-    onSignout,
-}: {
-    user: UserType;
-    onSignout: () => void;
-}) {
-    const name = user.firstName ?? user.email?.split("@")[0] ?? "User";
-
-    return (
-        <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-600 text-white">
-                    <User className="h-5 w-5" />
-                </div>
-                <span className="hidden text-sm font-medium sm:inline">
-                    {name}
-                </span>
-            </div>
-            <SignOutButton onSignout={onSignout} />
-        </div>
-    );
 }

@@ -10,6 +10,7 @@ interface AuthContextType {
     loading: boolean;
     signout: () => void;
     accessToken: string | null;
+    refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
     loading: true,
     signout: () => {},
     accessToken: null,
+    refreshUser: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -123,9 +125,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }).catch(() => {});
     };
 
+    const refreshUser = async () => {
+        if (!accessToken) return;
+
+        try {
+            const res = await fetch(`${API_URL}/api/auth/session`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            const data = await res.json();
+
+            if (data.ok && data.user) {
+                setUser(data.user);
+            }
+        } catch (err) {
+            console.error("Failed to refresh user:", err);
+        }
+    };
     return (
         <AuthContext.Provider
-            value={{ user, setUser, loading, signout, accessToken }}
+            value={{
+                user,
+                setUser,
+                loading,
+                signout,
+                accessToken,
+                refreshUser,
+            }}
         >
             {children}
         </AuthContext.Provider>
