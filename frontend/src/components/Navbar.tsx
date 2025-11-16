@@ -9,9 +9,11 @@ import { User as UserType } from "../../../shared/types/types";
 import { User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import SignOutButton from "./SignOutButton";
+import SignInModal from "./auth/SigninModal";
 
 export default function Navbar() {
-    const [open, setOpen] = useState(false);
+    const [openSignUpModal, setOpenSignUpModal] = useState(false);
+    const [openSignInModal, setOpenSignInModal] = useState(false);
     const { user, loading, signout } = useAuth();
 
     return (
@@ -60,13 +62,20 @@ export default function Navbar() {
                             <LoggedInUI user={user} onSignout={signout} />
                         ) : (
                             <>
-                                <SignInButton />
-                                <SignUpButton setOpen={setOpen} />
+                                <SignInButton setOpen={setOpenSignInModal} />
+                                <SignUpButton setOpen={setOpenSignUpModal} />
                             </>
                         )}
                     </div>
                 </nav>
-                <SignupModal isOpen={open} onClose={() => setOpen(false)} />
+                <SignupModal
+                    isOpen={openSignUpModal}
+                    onClose={() => setOpenSignUpModal(false)}
+                />
+                <SignInModal
+                    isOpen={openSignInModal}
+                    onClose={() => setOpenSignInModal(false)}
+                />
             </header>
         </>
     );

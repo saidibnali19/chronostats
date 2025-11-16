@@ -1,17 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Eye, EyeOff, X } from "lucide-react";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import SignModal from "./SignModal";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import {
+    getPasswordStrength,
+    validateConfirmPasswordField,
+    validateEmailField,
+    validateName,
+    validatePasswordField,
+} from "@/utils/formInputValidations";
 
-interface SignupModalProps {
+interface SignUpModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
-    const dialogRef = useRef<HTMLDialogElement>(null);
+export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -38,106 +45,56 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     // Auth context
     const { setUser } = useAuth();
 
-    // Open / close the dialog when props change
-    useEffect(() => {
-        const dialog = dialogRef.current;
-        if (!dialog) return;
-
-        if (isOpen && !dialog.open) {
-            dialog.showModal();
-        } else if (!isOpen && dialog.open) {
-            dialog.close();
-        }
-    }, [isOpen]);
-
     const handleClose = () => {
         onClose();
         setFirstName("");
+        setLastName("");
         setEmail("");
         setPassword("");
         setConfirmPassword("");
         setFirstNameError("");
+        setLastNameError("");
         setEmailError("");
         setPasswordError("");
         setConfirmPasswordError("");
         setError("");
     };
 
-    // VALIDATION LOGIC
-    const validateFirstName = (value: string) => {
-        const cleaned = value.trimStart(); // prevent "   a"
+    const handleFirstName = (value: string) => {
+        const { value: cleaned, error } = validateName(value);
+
         setFirstName(cleaned);
-
-        if (!cleaned || cleaned.trim().length === 0) {
-            setFirstNameError("First name is required.");
-        } else {
-            setFirstNameError("");
-        }
+        setFirstNameError(error);
     };
 
-    const validateLastName = (value: string) => {
-        const cleaned = value.trimStart();
+    const handleLastName = (value: string) => {
+        const { value: cleaned, error } = validateName(value);
+
         setLastName(cleaned);
-
-        if (!cleaned || cleaned.trim().length === 0) {
-            setLastNameError("Last name is required.");
-        } else {
-            setLastNameError("");
-        }
+        setLastNameError(error);
     };
 
-    const validateEmail = (value: string) => {
+    const handleEmail = (raw: string) => {
+        const valueWithoutSpaces = raw.replace(/\s+/g, "");
+
+        const { value, error } = validateEmailField(valueWithoutSpaces);
         setEmail(value);
-        if (!value) return setEmailError("Email is required.");
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(value)) {
-            setEmailError("Enter a valid email address.");
-        } else {
-            setEmailError("");
-        }
+        setEmailError(error);
     };
 
-    // Password strength meter
-    const calculatePasswordStrength = (value: string) => {
-        if (!value) return setPasswordStrength("");
-
-        let score = 0;
-
-        if (value.length >= 6) score++;
-        if (value.length >= 10) score++;
-        if (/[A-Z]/.test(value)) score++;
-        if (/[0-9]/.test(value)) score++;
-        if (/[^A-Za-z0-9]/.test(value)) score++; // symbols
-
-        if (score <= 2) setPasswordStrength("weak");
-        else if (score === 3 || score === 4) setPasswordStrength("medium");
-        else setPasswordStrength("strong");
-    };
-
-    const validatePassword = (value: string) => {
+    const handlePassword = (value: string) => {
         setPassword(value);
-        calculatePasswordStrength(value);
+        setPasswordStrength(getPasswordStrength(value));
 
-        if (!value) return setPasswordError("Password is required.");
-
-        if (value.length < 6) {
-            setPasswordError("Password must be at least 6 characters.");
-        } else {
-            setPasswordError("");
-        }
+        const { error } = validatePasswordField(value);
+        setPasswordError(error);
     };
 
-    const validateConfirmPassword = (value: string) => {
+    const handleConfirmPassword = (value: string) => {
         setConfirmPassword(value);
-        if (!value)
-            return setConfirmPasswordError("Please confirm your password.");
 
-        if (value !== password) {
-            setConfirmPasswordError("Passwords do not match.");
-        } else {
-            setConfirmPasswordError("");
-        }
+        const { error } = validateConfirmPasswordField(value, password);
+        setConfirmPasswordError(error);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -146,8 +103,6 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
 
         setError("");
 
-        console.log({ firstName, lastName, email, password });
-        // TODO: call your backend API
         try {
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`,
@@ -207,25 +162,12 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
         !confirmPasswordError;
 
     return (
-        <dialog
-            ref={dialogRef}
-            className="mx-auto mt-20 max-w-2xl rounded-2xl border-0 p-0 backdrop:bg-black/40 backdrop:backdrop-blur-sm md:min-w-sm lg:min-w-md"
+        <SignModal
+            isOpen={isOpen}
+            title="Create Your Account"
             onClose={handleClose}
         >
             <div className="relative space-y-4 rounded-2xl p-8 shadow-xl">
-                {/* Close Button */}
-                <button
-                    onClick={handleClose}
-                    autoFocus={false}
-                    className="absolute top-0 right-0 cursor-pointer p-2 hover:text-black"
-                >
-                    <X className="h-5 w-5" />
-                </button>
-
-                <h2 className="text-center text-2xl font-semibold">
-                    Create Your Account
-                </h2>
-
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2">
                         {/* Fisrt Name */}
@@ -246,7 +188,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                                 value={firstName}
                                 autoFocus={true}
                                 onChange={(e) =>
-                                    validateFirstName(e.target.value)
+                                    handleFirstName(e.target.value)
                                 }
                                 placeholder="First Name"
                             />
@@ -269,9 +211,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                                         : ""
                                 }`}
                                 value={lastName}
-                                onChange={(e) =>
-                                    validateLastName(e.target.value)
-                                }
+                                onChange={(e) => handleLastName(e.target.value)}
                                 placeholder="Last Name"
                             />
                             {lastNameError && (
@@ -292,7 +232,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                             type="email"
                             required
                             value={email}
-                            onChange={(e) => validateEmail(e.target.value)}
+                            onChange={(e) => handleEmail(e.target.value)}
                             className={`form-input w-full ${
                                 emailError
                                     ? "focus-visible:outline-red-500"
@@ -316,9 +256,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                                 type={showPassword ? "text" : "password"}
                                 required
                                 value={password}
-                                onChange={(e) =>
-                                    validatePassword(e.target.value)
-                                }
+                                onChange={(e) => handlePassword(e.target.value)}
                                 className={`form-input w-full ${
                                     passwordError
                                         ? "focus-visible:outline-red-500"
@@ -396,7 +334,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                                 required
                                 value={confirmPassword}
                                 onChange={(e) =>
-                                    validateConfirmPassword(e.target.value)
+                                    handleConfirmPassword(e.target.value)
                                 }
                                 className={`form-input w-full ${
                                     confirmPasswordError
@@ -466,6 +404,6 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                     Sign Up with Google
                 </button>
             </div>
-        </dialog>
+        </SignModal>
     );
 }
