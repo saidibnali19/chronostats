@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // 1. Load access token from localStorage
     useEffect(() => {
-        const token = localStorage.getItem("accesstoken");
+        const token = localStorage.getItem("accessToken");
         if (!token) {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setLoading(false);
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // 3. signout – clear both access token + refresh cookie
     const signout = async () => {
-        localStorage.removeItem("accesstoken");
+        localStorage.removeItem("accessToken");
         setUser(null);
 
         // Call backend to invalidate refresh token (optional but recommended)

@@ -23,7 +23,7 @@ export const getSession = async (req: Request, res: Response) => {
 
     try {
         // 2. Verify + type assertion
-        const secret = process.env.JWT_SECRET;
+        const secret = process.env.JWT_ACCESS_SECRET;
         if (!secret) {
             // Missing secret → treat as unauthorized
             return res.json({ ok: false });

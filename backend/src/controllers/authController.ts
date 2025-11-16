@@ -3,13 +3,14 @@ import User from "../models/User.js";
 import RefreshToken from "../models/RefreshToken.js";
 import bcrypt from "bcryptjs";
 import { validateSignup } from "../utils/validateSignup.js";
-import jwt, { SignOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { generateTokens } from "../utils/generateTokens.js";
 
-// Types
-type TokenPair = {
-    accessToken: string;
-    refreshToken: string;
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict" as const,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
 export const signup = async (req: Request, res: Response) => {
@@ -51,12 +52,7 @@ export const signup = async (req: Request, res: Response) => {
         });
 
         // Set cookie
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie("refreshToken", refreshToken, cookieOptions);
 
         res.status(201).json({
             success: true,
@@ -104,25 +100,16 @@ export const signin = async (req: Request, res: Response) => {
         }
 
         // Generate tokens
-        const accessToken = jwt.sign(
-            { userId: user._id },
-            process.env.JWT_SECRET!,
-            { expiresIn: "15m" }
-        );
-
-        const refreshToken = jwt.sign(
-            { userId: user._id },
-            process.env.JWT_REFRESH_SECRET!,
-            { expiresIn: "7d" }
-        );
+        const { accessToken, refreshToken } = generateTokens(String(user._id));
 
         // OPTIONAL: Set refresh token in HttpOnly cookie
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        await RefreshToken.create({
+            userId: user._id,
+            token: refreshToken,
+            expiresAt: new Date(Date.now() + cookieOptions.maxAge),
         });
+
+        res.cookie("refreshToken", refreshToken, cookieOptions);
 
         return res.status(200).json({
             message: "Login successful",
@@ -137,5 +124,28 @@ export const signin = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("❌ Login error:", error);
         return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+export const signout = async (req: Request, res: Response) => {
+    try {
+        const token = req.cookies?.refreshToken;
+
+        if (token) {
+            await RefreshToken.deleteOne({ token });
+        }
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
+        return res.json({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+        console.error("Logout error:", error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Server error" });
     }
 };

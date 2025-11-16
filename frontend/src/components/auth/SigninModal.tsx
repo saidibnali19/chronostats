@@ -62,16 +62,20 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
 
             const data = await res.json();
 
-            if (!data.success) {
+            if (!res.ok) {
                 setError(data.message || "Invalid credentials");
                 return;
             }
 
             if (data.accessToken) {
-                localStorage.setItem("accesstoken", data.accessToken);
+                localStorage.setItem("accessToken", data.accessToken);
             }
 
             setUser(data.user);
+
+            setEmail("");
+            setPassword("");
+            setError("");
             onClose();
         } catch (error) {
             console.error("Signin error:", error);
@@ -85,8 +89,13 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
         <SignModal isOpen={isOpen} onClose={handleClose} title="Sign In ">
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                    <label className="text-sm">Email</label>
+                    <label className="text-sm" htmlFor="signInemail">
+                        Email
+                    </label>
                     <input
+                        id="signInemail"
+                        type="email"
+                        required
                         className={`form-input w-full ${
                             emailError ? "focus-visible:outline-red-500" : ""
                         }`}
@@ -101,9 +110,12 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm">Password</label>
+                    <label className="text-sm" htmlFor="signInpassword">
+                        Password
+                    </label>
                     <div className="relative">
                         <input
+                            id="signInpassword"
                             type={showPassword ? "text" : "password"}
                             className={`form-input w-full ${
                                 passwordError

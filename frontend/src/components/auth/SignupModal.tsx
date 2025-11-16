@@ -126,7 +126,7 @@ export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
             }
 
             if (data.accessToken) {
-                localStorage.setItem("accesstoken", data.accessToken);
+                localStorage.setItem("accessToken", data.accessToken);
             }
 
             setUser(data.user);
