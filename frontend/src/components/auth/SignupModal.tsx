@@ -115,13 +115,14 @@ export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
                         email,
                         password,
                     }),
+                    credentials: "include",
                 },
             );
 
             const data = await res.json();
 
             if (!data.success) {
-                setError(data.message);
+                setError(data.message || "Signup failed");
                 return;
             }
 

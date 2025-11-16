@@ -1,14 +1,15 @@
-// src/context/AuthContext.tsx
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
 import { User } from "../../../shared/types/types";
+import { decodeToken } from "@/utils/jwt";
 
 interface AuthContextType {
     user: User | null;
     setUser: (user: User | null) => void;
     loading: boolean;
     signout: () => void;
+    accessToken: string | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,48 +17,116 @@ const AuthContext = createContext<AuthContextType>({
     setUser: () => {},
     loading: true,
     signout: () => {},
+    accessToken: null,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // 1. Load access token from localStorage
-    useEffect(() => {
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setLoading(false);
-            return;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+    // Clear any pending refresh
+    const clearRefreshTimeout = () => {
+        if (refreshTimeoutRef.current) {
+            clearTimeout(refreshTimeoutRef.current);
+            refreshTimeoutRef.current = null;
         }
+    };
 
-        // 2. Validate with backend
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/session`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.ok && data.user) setUser(data.user);
-                else setUser(null);
-            })
-            .catch(() => setUser(null))
-            .finally(() => setLoading(false));
+    // Schedule next refresh (called after login/refresh)
+    const scheduleRefresh = (token: string) => {
+        clearRefreshTimeout();
+
+        const decoded = decodeToken(token);
+        if (!decoded) return;
+
+        const expiresInMs = decoded.exp * 1000 - Date.now();
+        const refreshInMs = Math.max(expiresInMs - 60_000, 0); // 1 min before expiry
+
+        refreshTimeoutRef.current = setTimeout(() => {
+            refreshAccessToken();
+        }, refreshInMs);
+    };
+
+    // Refresh token + update state
+    const refreshAccessToken = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/auth/refresh`, {
+                method: "POST",
+                credentials: "include",
+            });
+
+            const data = await res.json();
+
+            if (data.success && data.accessToken) {
+                localStorage.setItem("accessToken", data.accessToken);
+                setAccessToken(data.accessToken);
+                setUser(data.user);
+                scheduleRefresh(data.accessToken); // reschedule
+            } else {
+                throw new Error("Refresh failed");
+            }
+        } catch (error) {
+            console.warn("Token refresh failed:", error);
+            signout(); // force logout
+        }
+    };
+
+    // Validate session on mount
+    useEffect(() => {
+        const initAuth = async () => {
+            const token = localStorage.getItem("accessToken");
+            if (!token) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/api/auth/session`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                const data = await res.json();
+
+                if (data.ok && data.user) {
+                    setUser(data.user);
+                    setAccessToken(token);
+                    scheduleRefresh(token);
+                } else {
+                    localStorage.removeItem("accessToken");
+                }
+            } catch {
+                localStorage.removeItem("accessToken");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        initAuth();
+
+        return () => clearRefreshTimeout();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 3. signout – clear both access token + refresh cookie
+    // Sign out
     const signout = async () => {
+        clearRefreshTimeout();
         localStorage.removeItem("accessToken");
         setUser(null);
+        setAccessToken(null);
 
-        // Call backend to invalidate refresh token (optional but recommended)
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signout`, {
+        await fetch(`${API_URL}/api/auth/signout`, {
             method: "POST",
-            credentials: "include", // sends httpOnly cookie
+            credentials: "include",
         }).catch(() => {});
     };
 
     return (
-        <AuthContext.Provider value={{ user, setUser, loading, signout }}>
+        <AuthContext.Provider
+            value={{ user, setUser, loading, signout, accessToken }}
+        >
             {children}
         </AuthContext.Provider>
     );

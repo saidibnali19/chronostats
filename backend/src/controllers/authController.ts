@@ -5,13 +5,7 @@ import bcrypt from "bcryptjs";
 import { validateSignup } from "../utils/validateSignup.js";
 import jwt from "jsonwebtoken";
 import { generateTokens } from "../utils/generateTokens.js";
-
-const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict" as const,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-};
+import { cookieOptions } from "../utils/coookieOptions.js";
 
 export const signup = async (req: Request, res: Response) => {
     try {
