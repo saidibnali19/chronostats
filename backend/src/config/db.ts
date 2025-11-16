@@ -10,7 +10,11 @@ const connectDB = async () => {
         if (!uri)
             throw new Error("MongoDB URI not found in environment variables");
 
-        await mongoose.connect(uri);
+        await mongoose.connect(uri, {
+            bufferCommands: false,
+            dbName: "chronostats",
+        });
+
         console.log(`✅ MongoDB connected (${process.env.NODE_ENV})`);
     } catch (error: any) {
         console.error("❌ MongoDB connection failed:", error);

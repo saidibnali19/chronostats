@@ -1,3 +1,12 @@
+export interface User {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    bio?: string;
+    avatar?: string;
+}
+
 export interface Feature {
     title: string;
     description: string;
