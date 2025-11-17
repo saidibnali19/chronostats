@@ -5,6 +5,10 @@ export interface User {
     email: string;
     bio?: string;
     avatar?: string;
+    location?: string;
+    phone?: string;
+    dob?: Date;
+    gender?: "Male" | "Female";
 }
 
 export interface Feature {
