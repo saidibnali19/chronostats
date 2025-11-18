@@ -37,9 +37,7 @@ export const refresh = async (req: Request, res: Response) => {
         }
 
         // 4. Fetch user (optional, but good for response)
-        const user = await User.findById(payload.userId).select(
-            "firstName lastName email"
-        );
+        const user = await User.findById(payload.userId).select("-password");
         if (!user) {
             return res
                 .status(401)
@@ -64,15 +62,9 @@ export const refresh = async (req: Request, res: Response) => {
         res.cookie("refreshToken", newRefreshToken, cookieOptions);
 
         // 8. Return new access token
-        res.json({
+        res.cookie("accessToken", accessToken, cookieOptions).json({
             success: true,
-            accessToken,
-            user: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-            },
+            user,
         });
     } catch (error) {
         console.error("Refresh token error:", error);

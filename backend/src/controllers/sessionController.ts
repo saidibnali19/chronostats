@@ -8,14 +8,7 @@ interface JwtPayload {
 }
 
 export const getSession = async (req: Request, res: Response) => {
-    const authHeader = req.headers.authorization;
-
-    // 1. Guard: no header or wrong format
-    if (!authHeader?.startsWith("Bearer ")) {
-        return res.json({ ok: false });
-    }
-
-    const token = authHeader.split(" ")[1]; // ← guaranteed string
+    const token = req.cookies?.accessToken;
 
     if (!token) {
         return res.json({ ok: false });
@@ -32,7 +25,7 @@ export const getSession = async (req: Request, res: Response) => {
 
         // 3. Find user
         const user = await User.findById(payload.userId).select(
-            "firstName lastName email"
+            "-password" // return everything except password
         );
 
         if (!user) {
@@ -42,11 +35,7 @@ export const getSession = async (req: Request, res: Response) => {
         // 4. Success response
         res.json({
             ok: true,
-            user: {
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-            },
+            user,
         });
     } catch {
         // 5. Any error (expired, malformed, etc.) → unauthorized

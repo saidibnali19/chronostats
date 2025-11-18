@@ -5,10 +5,9 @@ import SignInButton from "./SignInButton";
 import SignUpButton from "./SignUpButton";
 import { useState } from "react";
 import SignupModal from "./auth/SignupModal";
-// import { User as UserType } from "../../../shared/types/types";
-// import { User } from "lucide-react";
+
 import { useAuth } from "@/context/AuthContext";
-// import SignOutButton from "./SignOutButton";
+
 import SignInModal from "./auth/SigninModal";
 import LoggedInUI from "./LoggedInUI";
 

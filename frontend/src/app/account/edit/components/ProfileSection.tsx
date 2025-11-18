@@ -4,20 +4,23 @@ import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import { UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ProfileSection() {
     const { user, refreshUser } = useAuth();
 
-    const [lastName, setLastName] = useState(user?.lastName);
-    const [firstName, setFirstName] = useState(user?.firstName);
+    // const [lastName, setLastName] = useState(user?.lastName);
+    // const [firstName, setFirstName] = useState(user?.firstName);
 
-    const [dob, setDob] = useState(user?.dob || "");
+    // const [dob, setDob] = useState(user?.dob || "");
     const [gender, setGender] = useState(user?.gender || "");
     const [location, setLocation] = useState(user?.location || "");
     const [phone, setPhone] = useState(user?.phone || "");
 
     const [avatarPreview, setAvatarPreview] = useState(user?.avatar || "");
     const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+    const router = useRouter();
 
     function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -40,12 +43,17 @@ export default function ProfileSection() {
             formData.append("avatar", avatarFile);
         }
 
-        await fetch("/api/account/update", {
+        console.log(formData);
+
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/edit`, {
             method: "POST",
+            credentials: "include",
             body: formData,
         });
 
         await refreshUser();
+
+        router.push("/account");
     }
 
     return (
@@ -55,7 +63,7 @@ export default function ProfileSection() {
                 <div className="bg-base-500 mt-auto grid grid-rows-[auto_auto] place-content-baseline gap-4 px-4 py-4 md:px-8">
                     {avatarPreview ? (
                         <Image
-                            src={avatarPreview}
+                            src={`${process.env.NEXT_PUBLIC_API_URL}/avatarPreview`}
                             alt=""
                             width={150}
                             height={180}

@@ -43,7 +43,7 @@ export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
     >("");
 
     // Auth context
-    const { setUser } = useAuth();
+    const { refreshUser } = useAuth();
 
     const handleClose = () => {
         onClose();
@@ -126,11 +126,7 @@ export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
                 return;
             }
 
-            if (data.accessToken) {
-                localStorage.setItem("accessToken", data.accessToken);
-            }
-
-            setUser(data.user);
+            await refreshUser();
 
             setFirstName("");
             setLastName("");

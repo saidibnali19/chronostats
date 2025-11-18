@@ -47,16 +47,12 @@ export const signup = async (req: Request, res: Response) => {
 
         // Set cookie
         res.cookie("refreshToken", refreshToken, cookieOptions);
+        res.cookie("accessToken", accessToken, cookieOptions);
 
         res.status(201).json({
             success: true,
             message: "Account created successfully!",
-            user: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-            },
+            user: await User.findById(user._id).select("-password"),
 
             accessToken,
         });
@@ -105,16 +101,18 @@ export const signin = async (req: Request, res: Response) => {
 
         res.cookie("refreshToken", refreshToken, cookieOptions);
 
-        return res.status(200).json({
-            message: "Login successful",
-            user: {
-                id: user._id,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-            },
-            accessToken,
-        });
+        return res
+            .cookie("accessToken", accessToken, cookieOptions)
+            .status(200)
+            .json({
+                message: "Login successful",
+                user: {
+                    id: user._id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                },
+            });
     } catch (error) {
         console.error("❌ Login error:", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -131,11 +129,23 @@ export const signout = async (req: Request, res: Response) => {
 
         res.clearCookie("refreshToken", {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "none",
         });
 
-        return res.json({ success: true, message: "Logged out successfully" });
+        return res
+            .clearCookie("accessToken", {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none",
+            })
+            .clearCookie("refreshToken", {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none",
+            })
+            .status(200)
+            .json({ success: true, message: "Logged out successfully" });
     } catch (error) {
         console.error("Logout error:", error);
         return res

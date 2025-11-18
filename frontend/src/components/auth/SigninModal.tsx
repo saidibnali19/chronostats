@@ -16,7 +16,7 @@ interface SignInModalProps {
 }
 
 export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
-    const { setUser } = useAuth();
+    const { refreshUser } = useAuth();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -68,11 +68,7 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
                 return;
             }
 
-            if (data.accessToken) {
-                localStorage.setItem("accessToken", data.accessToken);
-            }
-
-            setUser(data.user);
+            await refreshUser();
 
             setEmail("");
             setPassword("");
