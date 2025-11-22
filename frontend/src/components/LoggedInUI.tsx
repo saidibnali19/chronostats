@@ -45,7 +45,14 @@ export default function LoggedInUI({
                 className="btn btn-secondary inline-flex size-8 items-center justify-around rounded-full p-0 text-white"
             >
                 {user.avatar ? (
-                    <Image src={user.avatar} width={20} height={20} alt="" />
+                    <Image
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${user.avatar}`}
+                        width={20}
+                        height={20}
+                        alt=""
+                        unoptimized
+                        className="rounded-full"
+                    />
                 ) : (
                     <UserIcon className="size-5" />
                 )}
@@ -62,10 +69,12 @@ export default function LoggedInUI({
                         <div className="btn btn-secondary inline-flex size-10 items-center justify-around rounded-full p-0 text-white">
                             {user.avatar ? (
                                 <Image
-                                    src={user.avatar}
+                                    src={`${process.env.NEXT_PUBLIC_API_URL}${user.avatar}`}
                                     width={20}
                                     height={20}
                                     alt=""
+                                    unoptimized
+                                    className="rounded-full"
                                 />
                             ) : (
                                 <UserIcon className="size-6" />

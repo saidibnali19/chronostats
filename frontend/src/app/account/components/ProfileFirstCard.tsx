@@ -9,10 +9,12 @@ export default function ProfileFirstCard({ user }: any) {
                 <div className="mt-auto grid grid-rows-[auto_auto] place-content-baseline gap-4 px-8 py-4">
                     {user.avatar ? (
                         <Image
-                            src={user.avatar}
-                            width={80}
-                            height={120}
+                            src={`${process.env.NEXT_PUBLIC_API_URL}${user.avatar}`}
+                            width={150}
+                            height={180}
                             alt=""
+                            unoptimized
+                            className="size-full rounded-sm object-cover"
                         />
                     ) : (
                         <div className="btn btn-secondary inline-flex h-30 w-20 items-center justify-around rounded-full p-0 text-white">

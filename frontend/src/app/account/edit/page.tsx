@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import ProfileSection from "./components/ProfileSection";
 import PasswordSection from "./components/PasswordSection";
 import DangerSection from "./components/DangerSection";

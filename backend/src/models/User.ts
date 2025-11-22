@@ -30,4 +30,18 @@ const userSchema = new Schema<IUser>(
     { timestamps: true }
 );
 
+userSchema.pre("findOneAndDelete", async function (next) {
+    const userId = this.getQuery()["_id"];
+
+    // Delete all related data
+    await Promise.all([
+        // mongoose.model("Post").deleteMany({ userId }),
+        // mongoose.model("Stats").deleteMany({ userId }),
+        // mongoose.model("Workout").deleteMany({ userId }),
+        // mongoose.model("Sleep").deleteMany({ userId }),
+    ]);
+
+    next();
+});
+
 export default mongoose.model<IUser>("User", userSchema);

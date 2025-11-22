@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import { UserIcon } from "lucide-react";
@@ -28,6 +28,24 @@ export default function ProfileSection() {
 
         setAvatarFile(file);
         setAvatarPreview(URL.createObjectURL(file));
+    }
+
+    useEffect(() => {
+        if (!user) return;
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setGender(user.gender || "");
+        setLocation(user.location || "");
+        setPhone(user.phone || "");
+
+        setAvatarPreview(user.avatar || "");
+    }, [user]);
+
+    function resolveImageUrl(url: string) {
+        if (!url) return "";
+        if (url.startsWith("blob:")) return url;
+        if (url.startsWith("http")) return url;
+        return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
     }
 
     async function handleSave() {
@@ -63,11 +81,12 @@ export default function ProfileSection() {
                 <div className="bg-base-500 mt-auto grid grid-rows-[auto_auto] place-content-baseline gap-4 px-4 py-4 md:px-8">
                     {avatarPreview ? (
                         <Image
-                            src={`${process.env.NEXT_PUBLIC_API_URL}/avatarPreview`}
+                            src={resolveImageUrl(avatarPreview)}
                             alt=""
                             width={150}
                             height={180}
                             className="rounded-sm object-cover"
+                            unoptimized
                         />
                     ) : (
                         <div className="flex h-full items-center justify-center gap-4 rounded-sm bg-gray-100 p-4 text-sm">
