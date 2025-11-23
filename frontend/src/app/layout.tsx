@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
     title: "Chronostats",
@@ -17,8 +19,11 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className="bg-base-400 text-base-400 text-base">
-                <Navbar />
-                {children}
+                <AuthProvider>
+                    <Toaster position="top-right" />
+                    <Navbar />
+                    {children}
+                </AuthProvider>
             </body>
         </html>
     );
