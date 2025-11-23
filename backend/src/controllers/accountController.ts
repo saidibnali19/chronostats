@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import fs from "fs";
+import path from "path";
 import User from "../models/User.js";
 
 export const updateProfile = async (req: Request, res: Response) => {
@@ -78,6 +80,18 @@ export const deleteAccount = async (req: Request, res: Response) => {
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
+        }
+
+        // Delete user avatar file if exists
+        if (user.avatar) {
+            // Convert "/uploads/...filename" → absolute path
+            const filePath = path.join(process.cwd(), user.avatar);
+
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error("Failed to delete avatar:", err);
+                }
+            });
         }
 
         // Delete user

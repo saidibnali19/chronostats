@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import ProfileFirstCard from "./components/ProfileFirstCard";
 import ProfileSecondCard from "./components/ProfileSecondCard";
@@ -25,9 +24,6 @@ export default function AccountPage() {
                 <h1 className="mb-4 text-xl font-semibold">
                     You are not logged in
                 </h1>
-                <Link href="/signin" className="text-blue-600 hover:underline">
-                    Sign in
-                </Link>
             </div>
         );
     }

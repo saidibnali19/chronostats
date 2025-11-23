@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import toast from "react-hot-toast";
 
 export default function DangerSection() {
     const [confirm, setConfirm] = useState("");
@@ -12,18 +13,33 @@ export default function DangerSection() {
     const router = useRouter();
 
     async function handleDelete() {
-        if (confirm !== "DELETE") {
-            alert("Type DELETE to confirm.");
-            return;
+        try {
+            if (confirm !== "DELETE") {
+                alert("Type DELETE to confirm.");
+                return;
+            }
+
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/account`,
+                {
+                    method: "DELETE",
+                    credentials: "include",
+                },
+            );
+
+            if (!res.ok) {
+                toast.error("Failed to delete account. Please try again.");
+                return;
+            }
+
+            toast.success("Account deleted successfully.");
+
+            setUser(null);
+            router.push("/");
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            toast.error("Failed to delete account. Please try again.");
         }
-
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account`, {
-            method: "DELETE",
-            credentials: "include",
-        });
-
-        setUser(null);
-        router.push("/");
     }
 
     return (

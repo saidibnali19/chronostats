@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import { UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function ProfileSection() {
     const { user, refreshUser } = useAuth();
@@ -49,29 +50,44 @@ export default function ProfileSection() {
     }
 
     async function handleSave() {
-        const formData = new FormData();
-        // formData.append("firstName", firstName);
-        // formData.append("lastName", lastName);
-        // formData.append("dob", dob);
-        formData.append("gender", gender);
-        formData.append("location", location);
-        formData.append("phone", phone);
+        try {
+            const formData = new FormData();
+            // formData.append("firstName", firstName);
+            // formData.append("lastName", lastName);
+            // formData.append("dob", dob);
+            formData.append("gender", gender);
+            formData.append("location", location);
+            formData.append("phone", phone);
 
-        if (avatarFile) {
-            formData.append("avatar", avatarFile);
+            if (avatarFile) {
+                formData.append("avatar", avatarFile);
+            }
+
+            console.log(formData);
+
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/account/edit`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    body: formData,
+                },
+            );
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                toast.error(data?.message || "Failed to update profile");
+                return;
+            }
+
+            await refreshUser();
+            toast.success("Profile updated successfully!");
+
+            router.push("/account");
+        } catch (error) {
+            console.error(error);
+            toast.error("An error occurred while updating profile");
         }
-
-        console.log(formData);
-
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/account/edit`, {
-            method: "POST",
-            credentials: "include",
-            body: formData,
-        });
-
-        await refreshUser();
-
-        router.push("/account");
     }
 
     return (

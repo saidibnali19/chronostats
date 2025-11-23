@@ -5,11 +5,32 @@ import { useState } from "react";
 import ProfileSection from "./components/ProfileSection";
 import PasswordSection from "./components/PasswordSection";
 import DangerSection from "./components/DangerSection";
+import { useAuth } from "@/context/AuthContext";
 
 export default function EditAccountPage() {
     const [tab, setTab] = useState<"profile" | "password" | "danger">(
         "profile",
     );
+
+    const { user, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="py-10 text-center">
+                <h1 className="mb-4 text-xl font-semibold">
+                    You are not logged in
+                </h1>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-gray-200/90 bg-[url(/images/accountbg.webp)] bg-cover p-4 bg-blend-overlay md:p-8">

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import SignModal from "./SignModal";
-import Image from "next/image";
+// import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import {
     getPasswordStrength,
@@ -141,10 +141,10 @@ export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
         }
     };
 
-    const googleSignup = () => {
-        // TODO: wire this to your OAuth route
-        window.location.href = "/api/auth/google";
-    };
+    // const googleSignup = () => {
+    //     // TODO: wire this to your OAuth route
+    //     window.location.href = "/api/auth/google";
+    // };
 
     const isFormValid =
         firstName &&
@@ -380,14 +380,14 @@ export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
                 </form>
 
                 {/* Divider */}
-                <div className="my-4 flex items-center">
+                {/* <div className="my-4 flex items-center">
                     <div className="h-px flex-1 bg-gray-300"></div>
                     <span className="mx-2 text-sm text-gray-500">or</span>
                     <div className="h-px flex-1 bg-gray-300"></div>
-                </div>
+                </div> */}
 
                 {/* Google Signup */}
-                <button
+                {/* <button
                     onClick={googleSignup}
                     className="btn btn-secondary flex w-full items-center justify-center gap-3"
                 >
@@ -399,7 +399,7 @@ export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
                         className="h-5 w-5"
                     />
                     Sign Up with Google
-                </button>
+                </button> */}
             </div>
         </SignModal>
     );
