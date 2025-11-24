@@ -95,7 +95,7 @@ export const deleteAccount = async (req: Request, res: Response) => {
         }
 
         // Delete user
-        await User.findByIdAndDelete(userId);
+        await User.findOneAndDelete({ _id: userId });
 
         // Clear cookies (important)
         res.clearCookie("accessToken", {

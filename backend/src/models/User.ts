@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import RefreshToken from "./RefreshToken.js";
 
 export interface IUser extends Document {
     firstName: string;
@@ -33,15 +34,23 @@ const userSchema = new Schema<IUser>(
 userSchema.pre("findOneAndDelete", async function (next) {
     const userId = this.getQuery()["_id"];
 
-    // Delete all related data
-    await Promise.all([
-        // mongoose.model("Post").deleteMany({ userId }),
-        // mongoose.model("Stats").deleteMany({ userId }),
-        // mongoose.model("Workout").deleteMany({ userId }),
-        // mongoose.model("Sleep").deleteMany({ userId }),
-    ]);
+    if (!userId) return next();
 
-    next();
+    try {
+        // Delete all refresh tokens belonging to this user
+        await RefreshToken.deleteMany({ userId });
+
+        // Add other cascading deletes here if needed
+        /* await Promise.all([
+            mongoose.model("Post").deleteMany({ userId }),
+            mongoose.model("Stats").deleteMany({ userId }),
+            ...
+        ]); */
+
+        next();
+    } catch (err) {
+        next(err as Error);
+    }
 });
 
 export default mongoose.model<IUser>("User", userSchema);
