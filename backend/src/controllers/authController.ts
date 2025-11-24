@@ -3,7 +3,6 @@ import User from "../models/User.js";
 import RefreshToken from "../models/RefreshToken.js";
 import bcrypt from "bcryptjs";
 import { validateSignup } from "../utils/validateSignup.js";
-import jwt from "jsonwebtoken";
 import { generateTokens } from "../utils/generateTokens.js";
 import { cookieOptions } from "../utils/coookieOptions.js";
 
