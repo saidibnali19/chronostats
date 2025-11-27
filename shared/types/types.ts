@@ -21,3 +21,16 @@ export interface BlogPost {
     title: string;
     imageUrl: string;
 }
+
+export interface Entry {
+    date: string;
+    activity: string;
+    category: string;
+
+    duration: number | ""; // allow empty input during typing
+    productivity: number | ""; // same reason
+    mood: string;
+
+    notes: string;
+    tags: string[];
+}
