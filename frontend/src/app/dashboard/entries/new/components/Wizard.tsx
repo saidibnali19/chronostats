@@ -35,28 +35,43 @@ export default function Wizard() {
             productivity: Number(form.productivity),
         };
 
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/entries/new`,
-            {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            },
-        );
+        console.log(payload);
+        // const res = await fetch(
+        //     `${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/entries/new`,
+        //     {
+        //         method: "POST",
+        //         credentials: "include",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify(payload),
+        //     },
+        // );
 
-        if (!res.ok) {
-            toast.error("Failed to create entry.");
-            return;
-        }
+        // if (!res.ok) {
+        //     toast.error("Failed to create entry.");
+        //     return;
+        // }
 
-        toast.success("Entry created successfully!");
-        setForm(initialForm);
-        setStep(1);
+        // toast.success("Entry created successfully!");
+        // setForm(initialForm);
+        // setStep(1);
     };
 
     return (
-        <>
+        <div className="bg-base-500 card mx-auto max-w-2xl space-y-4 shadow-lg">
+            {/* Step indicator */}
+            <div className="flex items-center justify-center gap-2">
+                {[1, 2, 3].map((n) => (
+                    <div
+                        key={n}
+                        className={`h-3 w-3 rounded-full transition-all ${
+                            step === n ? "bg-secondary" : "bg-base-400"
+                        }`}
+                    />
+                ))}
+            </div>
+
+            <h1 className="text-2xl font-medium">Add New Entry</h1>
+
             {step === 1 && (
                 <Step1Basic next={next} update={update} values={form} />
             )}
@@ -76,6 +91,6 @@ export default function Wizard() {
                     values={form}
                 />
             )}
-        </>
+        </div>
     );
 }

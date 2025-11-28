@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Entry } from "../../../../../../../shared/types/types";
 
 interface Props {
@@ -8,43 +9,173 @@ interface Props {
 }
 
 export default function Step2Stats({ next, prev, update, values }: Props) {
+    const [durationError, setDurationError] = useState("");
+    const [productivityError, setProductivityError] = useState("");
+    const [moodError, setMoodError] = useState("");
+
+    const moodOptions = [
+        "",
+        "Happy",
+        "Neutral",
+        "Relaxed",
+        "Energetic",
+        "Motivated",
+        "Tired",
+        "Stressed",
+        "Sad",
+        "Anxious",
+        "Calm",
+    ];
+
+    const handleDuration = (raw: string) => {
+        if (raw === "") {
+            setDurationError("Duration is required.");
+            update({ duration: "" });
+            return;
+        }
+
+        const value = Number(raw);
+
+        if (value < 0) {
+            setDurationError("Duration cannot be negative.");
+        } else if (value === 0) {
+            setDurationError("Duration must be greater than zero.");
+        } else {
+            setDurationError("");
+        }
+
+        update({ duration: value });
+    };
+
+    const handleProductivity = (raw: string) => {
+        if (!raw) {
+            update({ productivity: "" });
+            setProductivityError("");
+            return;
+        }
+
+        const numeric = Number(raw);
+
+        if (!Number.isInteger(numeric)) {
+            setProductivityError("Productivity must be an integer.");
+            return;
+        }
+
+        if (numeric < 0) {
+            setProductivityError("Productivity cannot be negative.");
+        } else if (numeric > 10) {
+            setProductivityError("Maximum productivity is 10.");
+        } else {
+            setProductivityError("");
+        }
+
+        update({ productivity: numeric });
+    };
+
+    const handleMood = (value: string) => {
+        update({ mood: value });
+        setMoodError("");
+    };
+    const isStepValid =
+        values.duration !== "" && !durationError && !productivityError;
+
     return (
-        <div>
-            <h2>Duration & Scores</h2>
+        <div className="card bg-base-400 space-y-4">
+            <h2 className="text-xl font-semibold text-gray-800">
+                Duration & Scores
+            </h2>
 
-            <input
-                type="number"
-                placeholder="Duration (hours)"
-                value={values.duration}
-                onChange={(e) =>
-                    update({
-                        duration:
-                            e.target.value === "" ? "" : Number(e.target.value),
-                    })
-                }
-            />
+            <div className="space-y-4">
+                <div className="grid gap-2">
+                    <label
+                        className="text-sm font-medium"
+                        htmlFor="entry-duration"
+                    >
+                        Duration (hours)
+                    </label>
+                    <input
+                        id="entry-duration"
+                        type="number"
+                        step={0.25}
+                        min={0}
+                        placeholder="e.g. 2"
+                        value={values.duration}
+                        onChange={(e) => handleDuration(e.target.value)}
+                        className={`form-input w-full ${
+                            durationError ? "focus-visible:outline-red-500" : ""
+                        }`}
+                        required
+                    />
+                    {durationError && (
+                        <p className="text-xs text-red-600">{durationError}</p>
+                    )}
+                </div>
 
-            <input
-                type="number"
-                placeholder="Productivity (1-10)"
-                value={values.productivity}
-                onChange={(e) =>
-                    update({
-                        productivity:
-                            e.target.value === "" ? "" : Number(e.target.value),
-                    })
-                }
-            />
+                <div className="grid gap-2">
+                    <label
+                        className="text-sm font-medium"
+                        htmlFor="entry-productivity"
+                    >
+                        Productivity (1–10)
+                    </label>
+                    <input
+                        id="entry-productivity"
+                        placeholder="e.g. 8"
+                        type="number"
+                        min={0}
+                        max={10}
+                        value={values.productivity}
+                        onChange={(e) => handleProductivity(e.target.value)}
+                        className={`form-input w-full ${
+                            productivityError
+                                ? "focus-visible:outline-red-500"
+                                : ""
+                        }`}
+                    />
+                    {productivityError && (
+                        <p className="text-xs text-red-600">
+                            {productivityError}
+                        </p>
+                    )}
+                </div>
 
-            <input
-                type="text"
-                placeholder="Mood"
-                value={values.mood}
-                onChange={(e) => update({ mood: e.target.value })}
-            />
+                <div className="grid gap-2">
+                    <label className="text-sm font-medium" htmlFor="entry-mood">
+                        Mood
+                    </label>
+                    <select
+                        id="entry-mood"
+                        value={values.mood}
+                        onChange={(e) => handleMood(e.target.value)}
+                        className="form-input w-full"
+                    >
+                        {moodOptions.map((mood) => (
+                            <option key={mood} value={mood}>
+                                {mood || "Select mood"}
+                            </option>
+                        ))}
+                    </select>
+                    {moodError && (
+                        <p className="text-xs text-red-600">{moodError}</p>
+                    )}
+                </div>
+            </div>
 
-            <button onClick={prev}>Back</button>
-            <button onClick={next}>Next</button>
+            {/* Buttons */}
+            <div className="flex justify-between pt-4">
+                <button onClick={prev} className="btn btn-outline">
+                    Back
+                </button>
+                <button
+                    onClick={next}
+                    className={`btn btn-secondary ${
+                        !isStepValid ? "cursor-not-allowed opacity-50" : ""
+                    }`}
+                    disabled={!isStepValid}
+                >
+                    Next
+                </button>
+            </div>
         </div>
     );
 }

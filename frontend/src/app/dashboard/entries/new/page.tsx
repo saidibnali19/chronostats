@@ -12,7 +12,9 @@ export default async function AddNewEntryPage() {
 
     return (
         <>
-            <Wizard />
+            <div className="bg-gray-200/90 bg-[url(/images/accountbg.webp)] bg-cover p-8 bg-blend-overlay">
+                <Wizard />
+            </div>
         </>
     );
 }
