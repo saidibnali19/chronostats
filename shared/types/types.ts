@@ -33,4 +33,6 @@ export interface Entry {
 
     notes: string;
     tags: string[];
+
+    description?: string; // detailed description of the activity for AI auto-fill
 }

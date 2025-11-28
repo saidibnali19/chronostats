@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "../../../shared/types/types";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
     user: User | null;
@@ -51,7 +52,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         };
 
         initAuth();
-    }, []);
+    }, [API_URL]);
+
+    const router = useRouter();
 
     const signout = async () => {
         setUser(null);
@@ -60,6 +63,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             method: "POST",
             credentials: "include",
         }).catch(() => {});
+
+        router.push("/");
     };
 
     const refreshUser = async () => {

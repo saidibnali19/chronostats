@@ -12,6 +12,7 @@ import {
     validateName,
     validatePasswordField,
 } from "@/utils/formInputValidations";
+import { useRouter } from "next/navigation";
 
 interface SignUpModalProps {
     isOpen: boolean;
@@ -19,6 +20,8 @@ interface SignUpModalProps {
 }
 
 export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
+    const router = useRouter();
+
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
@@ -134,6 +137,7 @@ export default function SignupModal({ isOpen, onClose }: SignUpModalProps) {
             setConfirmPassword("");
 
             onClose();
+            router.push("/dashboard");
         } catch (err) {
             console.error("Signup error:", err);
             setError("Something went wrong. Please try again.");

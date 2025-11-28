@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Entry } from "../../../../../../../shared/types/types";
+import Step1Description from "./Step1Description";
 
 type Props = {
     next: () => void;
@@ -41,6 +42,19 @@ export default function Step1Basic({ next, update, values }: Props) {
 
     return (
         <div className="card bg-base-400 space-y-4">
+            <Step1Description next={next} update={update} values={values} />
+
+            <div className="relative my-8">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                    <span className="bg-base-500 text-base-400 rounded-md p-[.5lh_2ch] font-medium">
+                        OR FILL MANUALLY
+                    </span>
+                </div>
+            </div>
+
             <h2 className="text-xl font-semibold">Basic Information</h2>
 
             <div className="space-y-4">

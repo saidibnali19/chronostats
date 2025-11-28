@@ -48,28 +48,25 @@ export default function Step2Stats({ next, prev, update, values }: Props) {
     };
 
     const handleProductivity = (raw: string) => {
-        if (!raw) {
+        if (raw.trim() === "") {
             update({ productivity: "" });
             setProductivityError("");
             return;
         }
 
-        const numeric = Number(raw);
+        const value = Number(raw);
 
-        if (!Number.isInteger(numeric)) {
+        if (!Number.isInteger(value)) {
             setProductivityError("Productivity must be an integer.");
-            return;
-        }
-
-        if (numeric < 0) {
-            setProductivityError("Productivity cannot be negative.");
-        } else if (numeric > 10) {
+        } else if (value < 1) {
+            setProductivityError("Minimum productivity is 1.");
+        } else if (value > 10) {
             setProductivityError("Maximum productivity is 10.");
         } else {
             setProductivityError("");
         }
 
-        update({ productivity: numeric });
+        update({ productivity: value });
     };
 
     const handleMood = (value: string) => {

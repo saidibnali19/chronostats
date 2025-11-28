@@ -9,6 +9,7 @@ import {
     validateEmailField,
     validateSigninPassword,
 } from "@/utils/formInputValidations";
+import { useRouter } from "next/navigation";
 
 interface SignInModalProps {
     isOpen: boolean;
@@ -16,6 +17,8 @@ interface SignInModalProps {
 }
 
 export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
+    const router = useRouter();
+
     const { refreshUser } = useAuth();
 
     const [email, setEmail] = useState("");
@@ -74,6 +77,8 @@ export default function SignInModal({ isOpen, onClose }: SignInModalProps) {
             setPassword("");
             setError("");
             onClose();
+
+            router.push("/dashboard");
         } catch (error) {
             console.error("Signin error:", error);
             setError("Something went wrong. Please try again.");
